@@ -12,12 +12,14 @@ import "time"
 import reaper "github.com/ramr/go-reaper"
 
 const NWORKERS = 3
-const REAPER_JSON_CONFIG = "/reaper/config/reaper.json"
+
+// const REAPER_JSON_CONFIG = "/reaper/config/reaper.json"
+const REAPER_JSON_CONFIG = "./config/reaper.json"
 
 func sleeper_test(set_proc_attributes bool) {
 	fmt.Printf(" - Set process attributes: %+v\n", set_proc_attributes)
 
-	cmd := exec.Command("sleep", "1")
+	cmd := exec.Command("sleep", "10")
 	if set_proc_attributes {
 		cmd.SysProcAttr = &syscall.SysProcAttr{
 			Setpgid: true,
@@ -35,18 +37,17 @@ func sleeper_test(set_proc_attributes bool) {
 
 	// Sleep for a wee bit longer to allow the reaper to reap the
 	// command on a slow system.
-	time.Sleep(4 * time.Second)
+	time.Sleep(12 * time.Second)
 
 	err = cmd.Wait()
 	if err != nil {
 		if set_proc_attributes {
-			fmt.Printf(" - Error waiting for command: %s\n",
-				err)
+			fmt.Printf(" - Error waiting for command: %s\n", err)
 		} else {
 			fmt.Printf(" - Expected wait failure: %s\n", err)
 		}
 	}
-
+	fmt.Printf("pid %d game over!\n", cmd.Process.Pid)
 } /*  End of function  sleeper_test.  */
 
 func start_workers() {
@@ -81,6 +82,7 @@ func main() {
 	config := reaper.Config{}
 
 	configFile, err := os.Open(REAPER_JSON_CONFIG)
+	fmt.Printf("config %s, main pid:%d, err %s\n", REAPER_JSON_CONFIG, os.Getpid(), err)
 	if err == nil {
 		decoder := json.NewDecoder(configFile)
 		err = decoder.Decode(&config)
@@ -94,6 +96,7 @@ func main() {
 
 	/*  Start the grim reaper ... */
 	if useConfig {
+		fmt.Printf("reaper start config:%#v\n", config)
 		go reaper.Start(config)
 
 		/*  Run the sleeper test setting the process attributes.  */

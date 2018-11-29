@@ -64,9 +64,7 @@ func reapChildren(config Config) {
 				break
 			}
 
-			fmt.Printf(" - Grim reaper cleanup: pid=%d, wstatus=%+v\n",
-				pid, wstatus)
-
+			fmt.Printf(" - Grim reaper cleanup: pid=%d, wstatus=%+v\n", pid, wstatus)
 		}
 	}
 

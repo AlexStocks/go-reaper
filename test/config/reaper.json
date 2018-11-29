@@ -1,4 +1,5 @@
 {
 	"Pid": 0,
-	"Options": 0
+	"Options": 0,
+        "DisablePid1Check": true
 }
